@@ -12,7 +12,7 @@ venv/
 # Evaluation artefacts
 data/runs/*.json
 !data/runs/.gitkeep
-regression-report.json
+!data/runs/baseline.json
 *.csv
 
 # OS / editor
