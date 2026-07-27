@@ -23,14 +23,14 @@ from typing import Any
 from . import config
 from .models import RootCause, Recommendation, ResponseScore
 
-_model = None
+_client = None
 
 
-def _get_model():
+def _get_client():
     """Lazy client init so importing this module never requires an API key."""
-    global _model
-    if _model is not None:
-        return _model
+    global _client
+    if _client is not None:
+        return _client
 
     if not config.judge_available():
         raise RuntimeError(
@@ -38,11 +38,10 @@ def _get_model():
             "your key, or run with --no-judge for deterministic metrics only."
         )
 
-    import google.generativeai as genai
+    from google import genai
 
-    genai.configure(api_key=config.GEMINI_API_KEY)
-    _model = genai.GenerativeModel(config.JUDGE_MODEL)
-    return _model
+    _client = genai.Client(api_key=config.GEMINI_API_KEY)
+    return _client
 
 
 def _strip_fences(text: str) -> str:
@@ -57,10 +56,15 @@ def _strip_fences(text: str) -> str:
 
 def _call_judge(prompt: str) -> dict[str, Any]:
     """Send a prompt to the judge and parse strict JSON back."""
-    model = _get_model()
-    response = model.generate_content(
-        prompt,
-        generation_config={"temperature": config.JUDGE_TEMPERATURE},
+    from google.genai import types
+
+    client = _get_client()
+    response = client.models.generate_content(
+        model=config.JUDGE_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=config.JUDGE_TEMPERATURE,
+        ),
     )
     return json.loads(_strip_fences(response.text))
 
