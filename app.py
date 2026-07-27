@@ -19,7 +19,6 @@ from src import agent_eval, config, llm_eval, regression, storage
 
 st.set_page_config(
     page_title="LLM & Agent Evaluation Platform",
-    page_icon="",
     layout="wide",
 )
 
@@ -169,7 +168,7 @@ with tab_agent:
         frame["failure_modes"] = frame["failure_modes"].apply(
             lambda modes: ", ".join(modes) if modes else "-"
         )
-        st.dataframe(frame, use_container_width=True, hide_index=True)
+        st.dataframe(frame, width="stretch", hide_index=True)
 
         st.download_button(
             "Download results CSV",
@@ -263,7 +262,7 @@ with tab_response:
                 st.bar_chart(frame["recommendation"].value_counts())
 
         st.subheader("Per-response results")
-        st.dataframe(frame, use_container_width=True, hide_index=True)
+        st.dataframe(frame, width="stretch", hide_index=True)
 
         st.download_button(
             "Download results CSV",
@@ -321,7 +320,7 @@ with tab_regression:
 
             st.dataframe(
                 pd.DataFrame([d.to_dict() for d in report.deltas]),
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
             st.code(report.format_report(), language="text")
